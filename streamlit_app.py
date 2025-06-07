@@ -29,6 +29,13 @@ def load_data():
 
 st.set_page_config(page_title="Forest Stands Canopy Height", layout="wide")
 st.title("🌲 Forest Stand Mean Canopy Height")
+st.markdown(
+    """
+    This app allows you to explore approximate canopy heights based on data from [QGIS Training Data – Forestry](https://github.com/qgis/QGIS-Training-Data/tree/master/exercise_data/forestry) and [Copernicus DEM on AWS](https://registry.opendata.aws/copernicus-dem/).  
+    A morphological opening window was used to estimate a DTM (digital terrain model or bare-earth model) from the DSM (digital surface model).  
+    Use the **Canopy height range** slider in the sidebar to filter forest plots by height, and copy the list of plot IDs within your selected range to the clipboard for further analysis.
+    """
+)
 
 gdf = load_data()
 
