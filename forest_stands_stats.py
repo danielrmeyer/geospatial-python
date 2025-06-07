@@ -27,7 +27,8 @@ with rasterio.open("data/raster/N61E025_copernicus.tif") as src:
     meta = src.meta
 
 # Morphological opening for bare-earth DTM approximation
-# See the README for an explanation of how we estimate the 
+# Copernicus DSM is ~10 m resolution. A 15×15 (pixel) window therefore spans about 150 m on a side
+# TODO do some analysis on the idea size
 dtm_approx = grey_opening(dsm, size=(15, 15))
 with rasterio.open("data/raster/N61E025_dtm_approx.tif", "w", **meta) as dst:
     dst.write(dtm_approx, 1)

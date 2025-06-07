@@ -57,7 +57,7 @@ layer = pdk.Layer(
     get_line_width=1,
     extruded=True,
     get_elevation="get mean_canopy",
-    elevation_scale=500,  # increased exaggeration
+    elevation_scale=500,  # TODO increased exaggeration but still not seeing extrusion effect
     auto_highlight=True,
     pickable=True,
 )
@@ -67,7 +67,7 @@ bounds = filtered.total_bounds  # [minLon, minLat, maxLon, maxLat]
 view_state = pdk.ViewState(
     latitude=(bounds[1] + bounds[3]) / 2,
     longitude=(bounds[0] + bounds[2]) / 2,
-    zoom=12,
+    zoom=13,
     pitch=45,
     bearing=30,
 )
