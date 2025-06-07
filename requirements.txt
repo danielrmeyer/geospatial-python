@@ -1,0 +1,8 @@
+geopandas
+rasterio
+rasterstats
+folium
+streamlit
+streamlit-folium
+scipy
+matplotlib

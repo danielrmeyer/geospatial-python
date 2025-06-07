@@ -1,0 +1,125 @@
+# streamlit_app.py
+
+import streamlit as st
+import geopandas as gpd
+import pydeck as pdk
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+import altair as alt
+import streamlit.components.v1 as components
+
+
+@st.cache_data
+def load_data():
+    gdf = gpd.read_file("data/forest_stands_with_elev.geojson")
+    gdf = gdf.to_crs(epsg=4326)
+    # add color ramp based on canopy height
+    min_h, max_h = gdf.mean_canopy.min(), gdf.mean_canopy.max()
+
+    def height_to_color(h):
+        # green to red gradient
+        ratio = (h - min_h) / (max_h - min_h) if max_h > min_h else 0
+        r = int(255 * ratio)
+        g = int(255 * (1 - ratio))
+        return [r, g, 50, 180]
+
+    gdf["fill_color"] = gdf.mean_canopy.apply(height_to_color)
+    return gdf
+
+
+st.set_page_config(page_title="Forest Stands Canopy Height", layout="wide")
+st.title("🌲 Forest Stand Mean Canopy Height")
+
+gdf = load_data()
+
+# Sidebar: filter by canopy height
+min_c, max_c = float(gdf.mean_canopy.min()), float(gdf.mean_canopy.max())
+sel = st.sidebar.slider("Canopy height range (m)", min_c, max_c, (min_c, max_c))
+
+# Sidebar: color legend for canopy height
+cmap = mpl.colors.LinearSegmentedColormap.from_list("green_red", [[0, 1, 0], [1, 0, 0]])
+norm = mpl.colors.Normalize(vmin=min_c, vmax=max_c)
+fig, ax = plt.subplots(figsize=(4, 0.5))
+cb = mpl.colorbar.ColorbarBase(ax, cmap=cmap, norm=norm, orientation="horizontal")
+cb.set_label("Mean Canopy Height (m)")
+st.sidebar.pyplot(fig)
+
+filtered = gdf[(gdf.mean_canopy >= sel[0]) & (gdf.mean_canopy <= sel[1])]
+
+# Build a Pydeck PolygonLayer for canopy height extrusion
+layer = pdk.Layer(
+    "PolygonLayer",
+    data=filtered,
+    get_polygon="geometry.coordinates",
+    get_fill_color="fill_color",
+    stroked=True,
+    get_line_color=[0, 0, 0, 200],
+    get_line_width=1,
+    extruded=True,
+    get_elevation="get mean_canopy",
+    elevation_scale=500,  # increased exaggeration
+    auto_highlight=True,
+    pickable=True,
+)
+
+# Compute viewport from filtered data bounds
+bounds = filtered.total_bounds  # [minLon, minLat, maxLon, maxLat]
+view_state = pdk.ViewState(
+    latitude=(bounds[1] + bounds[3]) / 2,
+    longitude=(bounds[0] + bounds[2]) / 2,
+    zoom=12,
+    pitch=45,
+    bearing=30,
+)
+
+# Render Pydeck chart
+deck = pdk.Deck(
+    map_style="mapbox://styles/mapbox/light-v9",
+    layers=[layer],
+    initial_view_state=view_state,
+    tooltip={
+        "text": (
+            "Stand ID: {StandID}\n"
+            "Mean Elevation: {mean_elev} m\n"
+            "Mean Canopy Height: {mean_canopy} m"
+        )
+    },
+)
+st.subheader("Forest Stands Map")
+st.pydeck_chart(deck, use_container_width=True)
+
+# Mean canopy height by Stand ID
+st.subheader("Mean Canopy Height by Stand")
+bar_df = filtered[["StandID", "mean_canopy"]]
+bar_chart = (
+    alt.Chart(bar_df)
+    .mark_bar()
+    .encode(
+        x=alt.X(
+            "StandID:N",
+            sort=alt.EncodingSortField(field="mean_canopy", order="descending"),
+            title="Stand ID",
+        ),
+        y=alt.Y("mean_canopy:Q", title="Mean Canopy Height (m)"),
+        tooltip=["StandID", "mean_canopy"],
+    )
+    .properties(width=700, height=300)
+)
+st.altair_chart(bar_chart, use_container_width=True)
+
+# Copy Stand IDs to clipboard
+# Sort IDs by descending canopy height to match the bar chart order
+ids = filtered.sort_values("mean_canopy", ascending=False)["StandID"].tolist()
+ids_str = ",".join(map(str, ids))
+components.html(
+    f"""
+<div>
+  <textarea id="ids" readonly style="width:100%;height:100px;">{ids_str}</textarea>
+  <br/>
+  <button onclick="navigator.clipboard.writeText(document.getElementById('ids').value)">
+    Copy IDs to clipboard
+  </button>
+</div>
+""",
+    height=200,
+)
