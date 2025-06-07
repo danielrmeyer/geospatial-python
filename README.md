@@ -17,7 +17,9 @@
 6. [Canopy Height Model (CHM)](#canopy-height-model-chm)
 7. [Zonal Statistics](#zonal-statistics)
 8. [Visualization](#visualization)
-9. [References](#references)
+9. [Screenshot](#screenshot)
+10. [References](#references)
+11. [TODO](#todo)
 
 ---
 
@@ -50,9 +52,9 @@ This project walks through:
 
 ### Forest Stands Shapefile
 
-1. Place `forest_stands_2012.shp` and its companion files (`.dbf`, `.shx`, `.prj`) in `data/`.
-2. Source data on GitHub: [QGIS Training Data – Forestry](https://github.com/qgis/QGIS-Training-Data/tree/master/exercise_data/forestry)
-2. Inspect the metadata:
+1. Place the shapefile files (`.shp`, `.dbf`, `.shx`, `.prj`) in `data/`.
+2. Source data on GitHub: [QGIS Training Data – Forestry](https://github.com/qgis/QGIS-Training-Data/tree/master/exercise_data/forestry)  
+3. Inspect the metadata:
    ```bash
    ogrinfo data/forest_stands_2012.shp -so -al
    ```
@@ -64,7 +66,7 @@ This project walks through:
 
 ### Bounding Box & Tile Selection
 
-Convert the UTM corners to WGS84:
+Convert UTM corners to WGS84:
 ```bash
 echo "397018.064608 6785470.289047" \
   | gdaltransform -s_srs EPSG:3067 -t_srs EPSG:4326
@@ -165,10 +167,11 @@ Launch the Streamlit app:
 streamlit run streamlit_app.py
 ```
 
-- Interactive map with 3D extrusion of canopy height.
-- Choropleth keyed by mean canopy height.
-- Bar chart sorted by canopy height.
-- Copyable list of Stand IDs.
+---
+
+## Screenshot
+
+![Streamlit App](assets/streamlit_app.png)
 
 ---
 
