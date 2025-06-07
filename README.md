@@ -184,4 +184,5 @@ streamlit run streamlit_app.py
 
 ## TODO
 
-- Find way to determine accuracy of our approximation
+- Find way to determine accuracy of our bare earth approximation
+- automate grabbing the DEM tile from copernicus given a shape file so tool can be used on any shape files
