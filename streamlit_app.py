@@ -5,7 +5,6 @@ import geopandas as gpd
 import pydeck as pdk
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-import altair as alt
 import streamlit.components.v1 as components
 
 
@@ -95,24 +94,14 @@ deck = pdk.Deck(
 st.subheader("Forest Stands Map")
 st.pydeck_chart(deck, use_container_width=True)
 
-# Mean canopy height by Stand ID
-st.subheader("Mean Canopy Height by Stand")
-bar_df = filtered[["StandID", "mean_canopy"]]
-bar_chart = (
-    alt.Chart(bar_df)
-    .mark_bar()
-    .encode(
-        x=alt.X(
-            "StandID:N",
-            sort=alt.EncodingSortField(field="mean_canopy", order="descending"),
-            title="Stand ID",
-        ),
-        y=alt.Y("mean_canopy:Q", title="Mean Canopy Height (m)"),
-        tooltip=["StandID", "mean_canopy"],
-    )
-    .properties(width=700, height=300)
-)
-st.altair_chart(bar_chart, use_container_width=True)
+# Histogram of Mean Canopy Height
+st.subheader("Histogram of Mean Canopy Height")
+# Plot histogram using matplotlib
+fig, ax = plt.subplots(figsize=(7, 3))
+ax.hist(filtered["mean_canopy"], bins=20)
+ax.set_xlabel("Mean Canopy Height (m)")
+ax.set_ylabel("Number of Stands")
+st.pyplot(fig)
 
 # Copy Stand IDs to clipboard
 # Sort IDs by descending canopy height to match the bar chart order
