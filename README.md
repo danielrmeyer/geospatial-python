@@ -186,3 +186,4 @@ streamlit run streamlit_app.py
 
 - Find way to determine accuracy of our bare earth approximation
 - automate grabbing the DEM tile from copernicus given a shape file so tool can be used on any shape files
+- Create a forest stand detail page which plots all canopy height data for that forest stand.
