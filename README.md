@@ -102,7 +102,10 @@ python forest_stands_stats.py
 
 ---
 
-## DTM Approximation
+
+## Summary of Steps
+
+### DTM Approximation
 
 Approximate bare-earth DTM using greyscale morphological opening:
 
@@ -121,7 +124,7 @@ with rasterio.open("data/raster/N61E025_dtm_approx.tif", "w", **meta) as dst:
 
 ---
 
-## Canopy Height Model (CHM)
+### Canopy Height Model (CHM)
 
 Compute CHM = DSM − DTM and save:
 
@@ -144,7 +147,7 @@ with rasterio.open("data/raster/N61E025_chm.tif", "w", **meta) as dst:
 
 ---
 
-## Zonal Statistics
+### Zonal Statistics
 
 Compute per-stand metrics with `rasterstats`:
 
