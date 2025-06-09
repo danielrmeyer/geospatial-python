@@ -27,12 +27,12 @@
 
 This project walks through:
 
-- Reading a forest-stands shapefile in Finland.
+- Reading a forest-stands shapefile.
 - Determining its geographic extent in WGS84.
 - Downloading a matching Copernicus DSM from AWS.
 - Approximating a bare-earth DTM via morphological opening.
 - Computing a Canopy Height Model (CHM) as **DSM − DTM**.
-- Calculating per-stand statistics (mean elevation, mean canopy height).
+- Calculating per-stand statistics.
 - Visualizing results interactively with Streamlit and Pydeck.
 
 ---
