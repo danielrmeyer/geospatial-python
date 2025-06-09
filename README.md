@@ -148,11 +148,11 @@ stands = gpd.read_file("data/forest_stands_2012.shp").to_crs("EPSG:4326")
 
 # Mean elevation
 elev_stats = zonal_stats(stands.geometry, "data/raster/N61E025_copernicus.tif", stats=["mean"])
-stands["mean_elev"] = [s["mean"] for s in elev_stats]
+stands["mean_elev"] = [x["mean"] for x in elev_stats]
 
 # Mean canopy height
 chm_stats = zonal_stats(stands.geometry, "data/raster/N61E025_chm.tif", stats=["mean"])
-stands["mean_canopy"] = [s["mean"] for s in chm_stats]
+stands["mean_canopy"] = [x["mean"] for x in chm_stats]
 
 stands.to_file("data/forest_stands_with_stats.geojson", driver="GeoJSON")
 ```
