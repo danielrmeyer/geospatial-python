@@ -6,6 +6,8 @@ import pydeck as pdk
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import streamlit.components.v1 as components
+import numpy as np
+import altair as alt
 
 
 @st.cache_data
@@ -27,12 +29,14 @@ def load_data():
 
 
 st.set_page_config(page_title="Forest Stands Canopy Height", layout="wide")
-st.title("🌲 Forest Stand Approximate Canopy Height")
+st.title("🌲 Forest Stand Canopy Height Approximation")
+st.subheader("Understand the distribution of forest canopy heights in a set of forest stands.")
 st.markdown(
     """
-    This app allows you to explore approximate canopy heights based on data from [QGIS Training Data – Forestry](https://github.com/qgis/QGIS-Training-Data/tree/master/exercise_data/forestry) and [Copernicus DEM on AWS](https://registry.opendata.aws/copernicus-dem/).  
-    A morphological opening window was used to estimate a DTM (digital terrain model or bare-earth model) from the DSM (digital surface model).  
-    Use the **Canopy height range** slider in the sidebar to filter forest plots by height, and copy the list of plot IDs within your selected range to the clipboard for further analysis.
+    The forest canopy height is estimated based upon a Digital Surface Model freely available from [Copernicus on AWS](https://registry.opendata.aws/copernicus-dem/).
+    In this example, a set of forest stands in Finland from [QGIS Training Data – Forestry](https://github.com/qgis/QGIS-Training-Data/tree/master/exercise_data/forestry) is used.
+    To approximate the canopy height a greyscale morphological opening window function from scipy with a window size of 150 m^2 was used to estimate a DTM (digital terrain model or bare-earth model) from the provided DSM (digital surface model).  
+    Use the **Canopy height range** slider in the sidebar to filter forest plots by mean canopy height, and copy the list of plot IDs within your selected range to the clipboard for further analysis.
     """
 )
 
@@ -99,15 +103,30 @@ deck = pdk.Deck(
     },
 )
 st.subheader("Forest Stands Map")
+
 st.pydeck_chart(deck, use_container_width=True)
 
 
-st.subheader("Histogram of Mean Canopy Height")
-fig, ax = plt.subplots(figsize=(7, 3))
-ax.hist(filtered["mean_canopy"], bins=20)
-ax.set_xlabel("Mean Canopy Height (m)")
-ax.set_ylabel("Number of Stands")
-st.pyplot(fig)
+
+st.subheader("Mean Forest Stand Canopy Height Scatter Plot")
+plot_df = filtered.sort_values("mean_canopy").copy()
+plot_df['StandID_str'] = plot_df['StandID'].astype(str)
+
+chart = alt.Chart(plot_df).mark_circle(size=60).encode(
+    x=alt.X('StandID_str:N', title='Stand ID',axis=alt.Axis(labels=False, ticks=False)),
+    y=alt.Y('mean_canopy:Q', title='Mean Canopy Height (m)'),
+    tooltip=[
+        alt.Tooltip('StandID_str:N', title='Stand ID'),
+        alt.Tooltip('mean_canopy:Q', title='Mean Canopy Height (m)')
+    ]
+).interactive()
+
+st.altair_chart(chart, use_container_width=True)
+
+# Display the loaded GeoDataFrame
+st.subheader("Forest Stands Data")
+st.dataframe(gdf)
+
 
 # Copy Stand IDs to clipboard
 ids = filtered.sort_values("mean_canopy", ascending=False)["StandID"].tolist()

@@ -41,7 +41,7 @@ stats = zonal_stats(
     geojson_out=False,
 )
 
-stands["mean_elev"] = [feat["mean"] for feat in stats]
+stands["mean_elev"] = [x["mean"] for x in stats]
 
 # Compute mean canopy height per stand
 stats_chm = zonal_stats(
@@ -50,7 +50,7 @@ stats_chm = zonal_stats(
     stats=["mean"],  #  TODO compute more states min, max for example
     geojson_out=False,
 )
-stands["mean_canopy"] = [stand["mean"] for stand in stats_chm]
+stands["mean_canopy"] = [x["mean"] for x in stats_chm]
 
 print(stands[["StandID", "mean_elev", "mean_canopy"]])
 

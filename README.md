@@ -96,7 +96,7 @@ aws s3 cp --no-sign-request \
 
 ## DTM Approximation
 
-Approximate bare-earth DTM using morphological opening:
+Approximate bare-earth DTM using greyscale morphological opening:
 
 ```python
 import rasterio
