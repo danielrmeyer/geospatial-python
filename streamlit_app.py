@@ -35,7 +35,7 @@ st.markdown(
     """
     The forest canopy height is estimated based upon a Digital Surface Model freely available from [Copernicus on AWS](https://registry.opendata.aws/copernicus-dem/).
     In this example, a set of forest stands in Finland from [QGIS Training Data – Forestry](https://github.com/qgis/QGIS-Training-Data/tree/master/exercise_data/forestry) is used.
-    To approximate the canopy height a greyscale morphological opening window function from scipy with a window size of 150 m^2 was used to estimate a DTM (digital terrain model or bare-earth model) from the provided DSM (digital surface model).  
+    To approximate the canopy height, a greyscale morphological opening window with a window size of 150 m² was used to estimate a DTM (digital terrain model or bare-earth model) from the provided DSM (digital surface model).  
     Use the **Canopy height range** slider in the sidebar to filter forest plots by mean canopy height, and copy the list of plot IDs within your selected range to the clipboard for further analysis.
     """
 )
