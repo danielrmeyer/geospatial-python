@@ -27,7 +27,7 @@ def load_data():
 
 
 st.set_page_config(page_title="Forest Stands Canopy Height", layout="wide")
-st.title("🌲 Forest Stand Mean Canopy Height")
+st.title("🌲 Forest Stand Approximate Canopy Height")
 st.markdown(
     """
     This app allows you to explore approximate canopy heights based on data from [QGIS Training Data – Forestry](https://github.com/qgis/QGIS-Training-Data/tree/master/exercise_data/forestry) and [Copernicus DEM on AWS](https://registry.opendata.aws/copernicus-dem/).  
@@ -43,13 +43,20 @@ min_c, max_c = float(gdf.mean_canopy.min()), float(gdf.mean_canopy.max())
 sel = st.sidebar.slider("Canopy height range (m)", min_c, max_c, (min_c, max_c))
 
 # Sidebar: color legend for canopy height
-cmap = mpl.colors.LinearSegmentedColormap.from_list("green_red", [[0, 1, 0], [1, 0, 0]])
 norm = mpl.colors.Normalize(vmin=min_c, vmax=max_c)
+sm = mpl.cm.ScalarMappable(norm=norm, cmap='RdYlGn_r')
+sm.set_array([])  # required for the colorbar
+
 fig, ax = plt.subplots(figsize=(4, 0.5))
-cb = mpl.colorbar.ColorbarBase(ax, cmap=cmap, norm=norm, orientation="horizontal")
-cb.set_label("Mean Canopy Height (m)")
+fig.colorbar(
+    sm,
+    cax=ax,
+    orientation='horizontal',
+    label='Mean Canopy Height (m)'
+)
 st.sidebar.pyplot(fig)
 
+# Compute the filtered df based on our sidebar selection
 filtered = gdf[(gdf.mean_canopy >= sel[0]) & (gdf.mean_canopy <= sel[1])]
 
 # Build a Pydeck PolygonLayer for canopy height extrusion
@@ -63,7 +70,7 @@ layer = pdk.Layer(
     get_line_width=1,
     extruded=True,
     get_elevation="get mean_canopy",
-    elevation_scale=500,  # TODO increased exaggeration but still not seeing extrusion effect
+    elevation_scale=500,  # TODO Why am I not seeing extrusion effect?
     auto_highlight=True,
     pickable=True,
 )
@@ -83,7 +90,7 @@ deck = pdk.Deck(
     map_style="mapbox://styles/mapbox/light-v9",
     layers=[layer],
     initial_view_state=view_state,
-    tooltip={
+    tooltip={ #  TODO we need min and max and whatever else is in there too
         "text": (
             "Stand ID: {StandID}\n"
             "Mean Elevation: {mean_elev} m\n"
@@ -94,9 +101,8 @@ deck = pdk.Deck(
 st.subheader("Forest Stands Map")
 st.pydeck_chart(deck, use_container_width=True)
 
-# Histogram of Mean Canopy Height
+
 st.subheader("Histogram of Mean Canopy Height")
-# Plot histogram using matplotlib
 fig, ax = plt.subplots(figsize=(7, 3))
 ax.hist(filtered["mean_canopy"], bins=20)
 ax.set_xlabel("Mean Canopy Height (m)")
@@ -104,7 +110,6 @@ ax.set_ylabel("Number of Stands")
 st.pyplot(fig)
 
 # Copy Stand IDs to clipboard
-# Sort IDs by descending canopy height to match the bar chart order
 ids = filtered.sort_values("mean_canopy", ascending=False)["StandID"].tolist()
 ids_str = ",".join(map(str, ids))
 components.html(
