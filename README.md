@@ -94,6 +94,14 @@ aws s3 cp --no-sign-request \
 
 ---
 
+## Run the code
+
+```python
+python forest_stands_stats.py
+```
+
+---
+
 ## DTM Approximation
 
 Approximate bare-earth DTM using greyscale morphological opening:
